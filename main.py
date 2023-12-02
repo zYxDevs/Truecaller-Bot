@@ -80,7 +80,7 @@ def echo(client, message):
                         pq = f"\n\n**----••Truecaller says----**\n\nName : `{tjsonload['data'][0]['name']}`\nCarrier : `{tjsonload['data'][0]['phones'][0]['carrier']}` \nE-mail : {tjsonload['data'][0]['internetAddresses'][0]['id']}"
                         frbsetrname = tjsonload['data'][0]['name']
                         frbsetrmail = tjsonload['data'][0]['internetAddresses'][0]['id']
-                    elif not tjsonload['data'][0]['internetAddresses']:
+                    else:
                         pq = f"\n\n**----••Truecaller says----**\n\nName : `{tjsonload['data'][0]['name']}`\nCarrier : `{tjsonload['data'][0]['phones'][0]['carrier']}`"
                         frbsetrname = tjsonload['data'][0]['name']
                 else:
@@ -92,25 +92,18 @@ def echo(client, message):
         response = eyecon_search(num)
         fbres = fb_search(num)
         fbrslt = fbres.url.replace('https://graph.', '').replace('picture?width=600', '')
-        if response:
+        if response and (rslt := response.json()):
+            temp = json.dumps(rslt).replace('[', '').replace(']', '')
+            jsonload = json.loads(temp)
 
-            rslt = response.json()
-
-            if rslt:
-                temp = json.dumps(rslt).replace('[', '').replace(']', '')
-                jsonload = json.loads(temp)
-
-                yk = f"\n\n**----••Eyecon says----**\n\nName :`{jsonload['name']}`"
+            yk = f"\n\n**----••Eyecon says----**\n\nName :`{jsonload['name']}`"
+            frbseyename = jsonload["name"]
+            if "facebook.com" in fbrslt:
+                yk = f"\n\n**----••Eyecon says----**\n\nName : `{jsonload['name']}`\nFacebook : {fbrslt}"
                 frbseyename = jsonload["name"]
-                if "facebook.com" in fbrslt:
-                    yk = f"\n\n**----••Eyecon says----**\n\nName : `{jsonload['name']}`\nFacebook : {fbrslt}"
-                    frbseyename = jsonload["name"]
-                    frbsefb = fbrslt
-            else:
-                yk = "**----••Eyecon says----**\n\nNo results found 🤦🏻‍♂️"
+                frbsefb = fbrslt
         else:
             yk = "**----••Eyecon says----**\n\nNo results found 🤦🏻‍♂️"
-
         yk += pq
         pro.edit(text=yk, disable_web_page_preview=True,reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton("Source", callback_data="src")]]))
